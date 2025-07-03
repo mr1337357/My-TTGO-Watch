@@ -1,3 +1,5 @@
+#include "gui/homescreen/homescreen.h"
+
 void homescreen_init()
 {
 

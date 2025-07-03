@@ -1,3 +1,6 @@
+#ifndef __WIDGET_H__
+#define __WIDGET_H__
+
 class widget
 {
     public:
@@ -14,3 +17,5 @@ class widget
         int click(int, int);
         int draw();
 };
+
+#endif //__WIDGET_H__
