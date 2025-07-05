@@ -8,17 +8,18 @@ class guiclass
 {
     public:
         guiclass();
-        void begin();
+        void begin(int w, int h);
         void disable_display(void *);
         void click(void *);
-        void add_screen(screen *);
+        void draw(void *);
         void push_screen(screen *);
+        void pop_screen();
+        framebuff *get_fb();
 
     private:
         screen **screenstack;
         int screenstack_depth;
-        screen **screens;
-        int numscreens;
+        screen *active;
         framebuff *fb;
         int last_input = 0;
 };
