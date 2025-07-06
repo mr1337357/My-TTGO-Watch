@@ -3,6 +3,8 @@
 
 #include "gui/framebuff.h"
 
+#define COLOR(r,g,b) (((r&0xF8)<<8)|((g&0xFC)<<3)|((b&0xF8)>>3))
+
 class widget
 {
     public:

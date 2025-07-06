@@ -17,28 +17,53 @@ void draw_screen(void *arg);
 void power_handler(void *arg)
 {
     static uint32_t last_press = 0;
+    static bool old_touch = false;
+    bool new_touch = false;
+    int16_t x;
+    int16_t y;
+    Logger.printf(__FILE__"(%d)\r\n",__LINE__);
     if(arg == 0)
     {
+        if(watch->power->isPEKShortPressIRQ())
+        {
+            watch->power->clearIRQ();
+        }
+        new_touch = watch->getTouch(x,y);
+        if(new_touch & !old_touch)
+        {
+            gui.click(x,y);
+        }
+        if(!new_touch)
+        {
+            old_touch = false;
+        }
         if(!watch->bl->isOn())
         {
             watch->openBL();
             watch->displayWakeup();
+            watch->touchToMonitor();
             now = watch->rtc->getDateTime();
             start_time = FreeRTOS::getTimeSinceStart();
             delayed_call_add(draw_screen,0,1,false);
         }
         last_press = FreeRTOS::getTimeSinceStart();
-        watch->power->clearIRQ();
-        delayed_call_add(power_handler,(void *)&last_press,last_press+10000,false);
+        if(!old_touch)
+        {
+            delayed_call_add(power_handler,(void *)&last_press,last_press+10001,false);
+        }
+        old_touch = new_touch;
     }
     else
     {
+        Logger.printf(__FILE__"(%d)\r\n",__LINE__);
         if(last_press <=(FreeRTOS::getTimeSinceStart()-10000))
         {
+            Logger.printf(__FILE__"(%d)\r\n",__LINE__);
             if(watch->bl->isOn())
             {
                 watch->closeBL();
                 watch->displaySleep();
+                watch->touchToSleep();
             }
         }
     }
@@ -86,6 +111,11 @@ void draw_screen(void *arg)
     delayed_call_add(draw_screen,0,start_time + 1000,false);
 }
 
+void touchInterrupt()
+{
+    delayed_call_add(power_handler,0,1,true);
+}
+
 void buttonInterrupt()
 {
     delayed_call_add(power_handler,0,1,true);
@@ -102,6 +132,8 @@ void setup()
     watch = TTGOClass::getWatch();
     watch->begin();
     watch->powerAttachInterrupt(buttonInterrupt);
+    pinMode(TOUCH_INT, INPUT);
+    attachInterrupt(TOUCH_INT, touchInterrupt, FALLING);
     watch->power->clearIRQ();
     watch->tft->setRotation(0);
     watch->tft->fillScreen(TFT_BLACK);
@@ -110,7 +142,9 @@ void setup()
     gui.begin(240,240);
     start_time = FreeRTOS::getTimeSinceStart();
     delayed_call_init();
+    now = watch->rtc->getDateTime();
     power_handler(0);
+    draw_screen(0);
 }
 
 int i = 0;

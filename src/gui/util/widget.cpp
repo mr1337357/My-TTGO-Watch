@@ -1,5 +1,6 @@
 #include "utils/logger.h"
 #include <stdlib.h>
+#include <esp32-hal-psram.h>
 #include "gui/util/widget.h"
 #include "widget.h"
 
@@ -39,15 +40,22 @@ widget::~widget()
 
 void widget::addChild(widget *child)
 {
-    Logger.printf(__FILE__"(%d)\r\n",__LINE__);
+    int i;
     widget **newptr;
-    newptr = (widget **)realloc(this->children,this->numChildren+1);
+    newptr = (widget **)ps_malloc(sizeof(widget *) * (this->numChildren+1));
     if(newptr)
     {
+        for(i=0;i<this->numChildren;i++)
+        {
+            newptr[i] = this->children[i];
+        }
+        if(this->children != 0)
+        {
+            free(this->children);
+        }
         this->children = newptr;
+        this->children[numChildren++] = child;
     }
-    this->children[numChildren++] = child;
-    Logger.printf(__FILE__"(%d)\r\n",__LINE__);
 }
 
 int widget::click(int x, int y)

@@ -19,6 +19,11 @@ framebuff::framebuff(int w, int h, uint16_t *p)
     this->pixels = p;
 }
 
+framebuff::~framebuff()
+{
+    
+}
+
 void framebuff::set_pixel(int x, int y, uint16_t c)
 {
     if(x < 0 || x >= this->w)

@@ -10,7 +10,7 @@ class guiclass
         guiclass();
         void begin(int w, int h);
         void disable_display(void *);
-        void click(void *);
+        void click(uint16_t x, uint16_t y);
         void draw(void *);
         void push_screen(screen *);
         void pop_screen();

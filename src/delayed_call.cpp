@@ -1,4 +1,5 @@
 #include <FreeRTOS.h>
+#include <esp32-hal-psram.h>
 #include "utils/minheap.h"
 
 static minheap mh;
@@ -15,14 +16,14 @@ void delayTask(void *arg);
 
 void delayed_call_init()
 {
-    minheap_init(&mh,32);
+    minheap_init(&mh,128);
     delay_sem = xSemaphoreCreateBinary();
 }
 
 void delayed_call_add(void (*fxn)(void *), void *arg, int calltime, bool isIsr)
 {
     BaseType_t taskWoken;
-    delayed_call *call = (delayed_call *)malloc(sizeof(delayed_call));
+    delayed_call *call = (delayed_call *)ps_malloc(sizeof(delayed_call));
     call->cb = fxn;
     call->arg = arg;
     if(calltime == 0)

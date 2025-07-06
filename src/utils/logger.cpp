@@ -43,4 +43,4 @@ int logger::printf(char *fmt, ...)
     return offset;
 }
 
-logger Logger(1024);
+logger Logger(4096);

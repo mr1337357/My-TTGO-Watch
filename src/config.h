@@ -22,7 +22,7 @@
  */
 #ifndef _CONFIG_H
 
-    #include "lvgl.h"
+    //#include "lvgl.h"
 
     #ifdef NATIVE_64BIT
             #define RES_X_MAX       LV_HOR_RES_MAX
