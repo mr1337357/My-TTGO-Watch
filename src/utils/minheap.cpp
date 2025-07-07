@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "utils/minheap.h"
+#include "minheap.h"
 
 #define PARENT(idx) ((idx-1)/2)
 #define LEFT(idx) ((2 * idx) + 1)
@@ -124,4 +125,15 @@ uint64_t minheap_peek_prio(minheap *mh)
         return mh->prio[0];
     }
     return 0;
+}
+
+int minheap_count(minheap *mh)
+{
+    return mh->count;
+}
+
+int minheap_debug_Read(minheap *mh, int index, void **elem)
+{
+    *elem = mh->elem[index];
+    return mh->prio[index];
 }

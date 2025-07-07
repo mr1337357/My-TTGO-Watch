@@ -21,44 +21,42 @@ void power_handler(void *arg)
     bool new_touch = false;
     int16_t x;
     int16_t y;
-    Logger.printf(__FILE__"(%d)\r\n",__LINE__);
     if(arg == 0)
     {
+        bool isEvent = false;
+        watch->power->readIRQ();
         if(watch->power->isPEKShortPressIRQ())
         {
-            watch->power->clearIRQ();
+            isEvent = true;
         }
+        watch->power->clearIRQ();
         new_touch = watch->getTouch(x,y);
         if(new_touch & !old_touch)
         {
             gui.click(x,y);
-        }
-        if(!new_touch)
-        {
-            old_touch = false;
-        }
-        if(!watch->bl->isOn())
-        {
-            watch->openBL();
-            watch->displayWakeup();
-            watch->touchToMonitor();
-            now = watch->rtc->getDateTime();
-            start_time = FreeRTOS::getTimeSinceStart();
-            delayed_call_add(draw_screen,0,1,false);
-        }
-        last_press = FreeRTOS::getTimeSinceStart();
-        if(!old_touch)
-        {
-            delayed_call_add(power_handler,(void *)&last_press,last_press+10001,false);
+            isEvent = true;
         }
         old_touch = new_touch;
+        if(isEvent)
+        {
+            if(!watch->bl->isOn())
+            {
+                watch->openBL();
+                watch->displayWakeup();
+                watch->touchToMonitor();
+                now = watch->rtc->getDateTime();
+                start_time = FreeRTOS::getTimeSinceStart();
+                delayed_call_add(draw_screen,0,1,false);
+            }
+            last_press = FreeRTOS::getTimeSinceStart();
+            delayed_call_add(power_handler,(void *)&last_press,last_press+10001,false);
+        }
+        
     }
     else
     {
-        Logger.printf(__FILE__"(%d)\r\n",__LINE__);
         if(last_press <=(FreeRTOS::getTimeSinceStart()-10000))
         {
-            Logger.printf(__FILE__"(%d)\r\n",__LINE__);
             if(watch->bl->isOn())
             {
                 watch->closeBL();
@@ -123,7 +121,7 @@ void buttonInterrupt()
 
 void setup()
 {
-    delay(1000);
+    //delay(1000);
     Serial.begin(115200);
     Logger.begin(&Serial);
     Logger.printf("begin!\r\n");

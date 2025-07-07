@@ -17,7 +17,6 @@ void guiclass::begin(int w, int h)
 
 void guiclass::click(uint16_t x, uint16_t y)
 {
-    Logger.printf(__FILE__ "(%d)\r\n", __LINE__);
     this->active->click(x,y);
 }
 
